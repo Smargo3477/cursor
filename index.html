@@ -5,6 +5,488 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>我的记事本</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+      :root {
+        color-scheme: light;
+        --text: #172033;
+        --muted: #6b7280;
+        --primary: #6d5dfc;
+        --pink: #ff7ab6;
+        --accent: #ffb86b;
+        --danger: #e5484d;
+        --shadow: 0 28px 80px rgba(10, 18, 36, 0.28);
+        --small-shadow: 0 14px 36px rgba(35, 42, 72, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+      }
+
+      body {
+        position: relative;
+        overflow-x: hidden;
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 10% 8%, rgba(255, 122, 182, 0.38), transparent 28rem),
+          radial-gradient(circle at 92% 2%, rgba(109, 93, 252, 0.48), transparent 30rem),
+          linear-gradient(135deg, #fff6eb 0%, #eef1ff 45%, #d7eef7 100%);
+        color: var(--text);
+        font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+
+      body::before {
+        position: fixed;
+        inset: 0;
+        z-index: -3;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+        background-size: 44px 44px;
+        content: "";
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 78%);
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:disabled,
+      input:disabled,
+      textarea:disabled {
+        cursor: not-allowed;
+        opacity: 0.58;
+      }
+
+      .background-orb {
+        position: fixed;
+        z-index: -2;
+        border-radius: 999px;
+        filter: blur(10px);
+        opacity: 0.72;
+      }
+
+      .orb-one {
+        top: 13%;
+        left: -90px;
+        width: 220px;
+        height: 220px;
+        background: linear-gradient(135deg, var(--pink), var(--accent));
+      }
+
+      .orb-two {
+        right: -120px;
+        bottom: 8%;
+        width: 280px;
+        height: 280px;
+        background: linear-gradient(135deg, #62d2ff, var(--primary));
+      }
+
+      .app-shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0;
+      }
+
+      .hero,
+      .workspace {
+        border: 1px solid rgba(255, 255, 255, 0.58);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(22px);
+      }
+
+      .hero {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 28px;
+        overflow: hidden;
+        margin-bottom: 24px;
+        padding: clamp(24px, 4vw, 42px);
+        border-radius: 36px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.5)),
+          linear-gradient(135deg, rgba(109, 93, 252, 0.18), rgba(255, 184, 107, 0.18));
+      }
+
+      .hero::after {
+        position: absolute;
+        right: -70px;
+        bottom: -115px;
+        width: 310px;
+        height: 310px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(109, 93, 252, 0.24), transparent 68%);
+        content: "";
+      }
+
+      .hero-content,
+      .hero-actions {
+        position: relative;
+        z-index: 1;
+      }
+
+      .brand-row,
+      .hero-pills,
+      .editor-header,
+      .panel-title {
+        display: flex;
+        align-items: center;
+      }
+
+      .brand-row {
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .app-mark {
+        display: inline-grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--primary), var(--pink));
+        color: #ffffff;
+        font-size: 1.15rem;
+        font-weight: 900;
+        box-shadow: 0 16px 34px rgba(109, 93, 252, 0.32);
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--primary);
+        font-size: 0.76rem;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        line-height: 1.08;
+      }
+
+      h1 {
+        max-width: 720px;
+        font-size: clamp(2.8rem, 8vw, 6.2rem);
+        letter-spacing: -0.08em;
+      }
+
+      h2 {
+        font-size: clamp(1.35rem, 3vw, 2rem);
+        letter-spacing: -0.04em;
+      }
+
+      .hero-text {
+        max-width: 590px;
+        margin: 18px 0 0;
+        color: #4d5568;
+        font-size: clamp(1rem, 2vw, 1.18rem);
+        line-height: 1.8;
+      }
+
+      .hero-pills {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .hero-pills span {
+        border: 1px solid rgba(109, 93, 252, 0.16);
+        border-radius: 999px;
+        padding: 9px 13px;
+        background: rgba(255, 255, 255, 0.68);
+        color: #38415a;
+        font-size: 0.88rem;
+        font-weight: 800;
+      }
+
+      .hero-actions {
+        display: grid;
+        align-content: center;
+        justify-items: end;
+        min-width: 190px;
+      }
+
+      .today-label {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 0.92rem;
+        font-weight: 800;
+      }
+
+      .primary-button,
+      .ghost-button {
+        border: 0;
+        border-radius: 999px;
+        font-weight: 900;
+        transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      }
+
+      .primary-button {
+        padding: 15px 24px;
+        background: linear-gradient(135deg, var(--primary), var(--pink));
+        color: #ffffff;
+        box-shadow: 0 16px 34px rgba(109, 93, 252, 0.34);
+      }
+
+      .primary-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 42px rgba(109, 93, 252, 0.4);
+      }
+
+      .ghost-button {
+        border: 1px solid rgba(229, 72, 77, 0.2);
+        padding: 11px 16px;
+        background: rgba(255, 255, 255, 0.64);
+        color: var(--text);
+      }
+
+      .ghost-button:hover {
+        transform: translateY(-1px);
+        background: #ffffff;
+        box-shadow: var(--small-shadow);
+      }
+
+      .ghost-button.danger {
+        color: var(--danger);
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 345px minmax(0, 1fr);
+        overflow: hidden;
+        min-height: 680px;
+        border-radius: 36px;
+        background: rgba(255, 255, 255, 0.48);
+      }
+
+      .notes-panel {
+        padding: 24px;
+        border-right: 1px solid rgba(255, 255, 255, 0.68);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.42)),
+          rgba(255, 255, 255, 0.56);
+      }
+
+      .panel-title {
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+
+      .search-label,
+      .field-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        font-weight: 900;
+      }
+
+      .search-input,
+      .title-input,
+      .content-input {
+        width: 100%;
+        border: 1px solid rgba(107, 114, 128, 0.12);
+        outline: none;
+        background: rgba(255, 255, 255, 0.84);
+        color: var(--text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .search-input,
+      .title-input {
+        padding: 15px 17px;
+      }
+
+      .search-input {
+        border-radius: 18px;
+      }
+
+      .title-input {
+        margin-bottom: 20px;
+        border-radius: 22px;
+        font-size: 1.25rem;
+        font-weight: 900;
+      }
+
+      .search-input:focus,
+      .title-input:focus,
+      .content-input:focus {
+        border-color: rgba(109, 93, 252, 0.56);
+        box-shadow:
+          0 0 0 5px rgba(109, 93, 252, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .notes-list {
+        display: grid;
+        gap: 13px;
+        margin-top: 18px;
+      }
+
+      .note-card {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 22px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--text);
+        text-align: left;
+        box-shadow: 0 10px 28px rgba(35, 42, 72, 0.08);
+      }
+
+      .note-card::before {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 5px;
+        background: linear-gradient(180deg, var(--accent), var(--pink));
+        content: "";
+        opacity: 0;
+        transition: opacity 160ms ease;
+      }
+
+      .note-card:hover,
+      .note-card.active {
+        transform: translateY(-2px);
+        border-color: rgba(109, 93, 252, 0.22);
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 18px 42px rgba(35, 42, 72, 0.16);
+      }
+
+      .note-card.active::before {
+        opacity: 1;
+      }
+
+      .note-card-title {
+        display: block;
+        margin-bottom: 7px;
+        overflow: hidden;
+        font-weight: 900;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .note-card-preview {
+        display: -webkit-box;
+        overflow: hidden;
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.55;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      .note-card-time {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 6px 10px;
+        background: rgba(109, 93, 252, 0.08);
+        color: #5e6680;
+        font-size: 0.76rem;
+        font-weight: 800;
+      }
+
+      .empty-state {
+        padding: 26px 18px;
+        border: 1px dashed rgba(109, 93, 252, 0.28);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.5);
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .editor-panel {
+        padding: clamp(24px, 4vw, 38px);
+        background:
+          radial-gradient(circle at top right, rgba(255, 184, 107, 0.14), transparent 26rem),
+          rgba(255, 255, 255, 0.38);
+      }
+
+      .editor-header {
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 30px;
+      }
+
+      .editor-subtitle {
+        margin: 9px 0 0;
+        color: var(--muted);
+      }
+
+      .content-input {
+        min-height: 430px;
+        padding: 22px;
+        border-radius: 26px;
+        line-height: 1.75;
+        resize: vertical;
+      }
+
+      .save-status {
+        display: inline-flex;
+        margin: 14px 0 0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.58);
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+
+      @media (max-width: 780px) {
+        .app-shell {
+          width: min(100% - 20px, 1180px);
+          padding: 18px 0;
+        }
+
+        .hero {
+          flex-direction: column;
+          border-radius: 28px;
+        }
+
+        .hero-actions {
+          justify-items: stretch;
+        }
+
+        .primary-button {
+          width: 100%;
+        }
+
+        .workspace {
+          grid-template-columns: 1fr;
+          border-radius: 28px;
+        }
+
+        .notes-panel {
+          border-right: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.68);
+        }
+
+        .editor-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .ghost-button {
+          width: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="background-orb orb-one"></div>
@@ -65,6 +547,194 @@
       </section>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+      const STORAGE_KEY = "vibe-notepad-notes";
+
+      const notesList = document.querySelector("#notes-list");
+      const searchInput = document.querySelector("#search-input");
+      const titleInput = document.querySelector("#note-title");
+      const contentInput = document.querySelector("#note-content");
+      const newNoteButton = document.querySelector("#new-note-button");
+      const deleteNoteButton = document.querySelector("#delete-note-button");
+      const saveStatus = document.querySelector("#save-status");
+
+      let notes = loadNotes();
+      let activeNoteId = notes[0]?.id ?? null;
+
+      function createId() {
+        if (crypto.randomUUID) {
+          return crypto.randomUUID();
+        }
+
+        return `note-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function loadNotes() {
+        const savedNotes = localStorage.getItem(STORAGE_KEY);
+
+        if (!savedNotes) {
+          return [
+            {
+              id: createId(),
+              title: "欢迎使用记事本",
+              content: "点击左侧新建笔记，或者直接修改这条示例笔记。你的内容会自动保存在浏览器里。",
+              updatedAt: new Date().toISOString(),
+            },
+          ];
+        }
+
+        try {
+          return JSON.parse(savedNotes);
+        } catch {
+          return [];
+        }
+      }
+
+      function saveNotes() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        saveStatus.textContent = `已保存：${formatDate(new Date().toISOString())}`;
+      }
+
+      function createNote() {
+        const note = {
+          id: createId(),
+          title: "未命名笔记",
+          content: "",
+          updatedAt: new Date().toISOString(),
+        };
+
+        notes = [note, ...notes];
+        activeNoteId = note.id;
+        saveNotes();
+        render();
+        titleInput.focus();
+        titleInput.select();
+      }
+
+      function updateActiveNote() {
+        notes = notes.map((note) => {
+          if (note.id !== activeNoteId) {
+            return note;
+          }
+
+          return {
+            ...note,
+            title: titleInput.value.trim() || "未命名笔记",
+            content: contentInput.value,
+            updatedAt: new Date().toISOString(),
+          };
+        });
+
+        saveNotes();
+        renderNotesList();
+      }
+
+      function deleteActiveNote() {
+        if (!activeNoteId) {
+          return;
+        }
+
+        const activeNote = getActiveNote();
+        const confirmed = window.confirm(`确定要删除「${activeNote.title}」吗？`);
+
+        if (!confirmed) {
+          return;
+        }
+
+        notes = notes.filter((note) => note.id !== activeNoteId);
+        activeNoteId = notes[0]?.id ?? null;
+        saveNotes();
+        render();
+      }
+
+      function getActiveNote() {
+        return notes.find((note) => note.id === activeNoteId);
+      }
+
+      function render() {
+        renderNotesList();
+        renderEditor();
+      }
+
+      function renderNotesList() {
+        const keyword = searchInput.value.trim().toLowerCase();
+        const filteredNotes = notes.filter((note) => {
+          const searchableText = `${note.title} ${note.content}`.toLowerCase();
+          return searchableText.includes(keyword);
+        });
+
+        notesList.innerHTML = "";
+
+        if (filteredNotes.length === 0) {
+          const emptyState = document.createElement("p");
+          emptyState.className = "empty-state";
+          emptyState.textContent = keyword ? "没有找到匹配的笔记" : "还没有笔记，点击右上角新建一条吧";
+          notesList.append(emptyState);
+          return;
+        }
+
+        filteredNotes.forEach((note) => {
+          const button = document.createElement("button");
+          button.className = `note-card${note.id === activeNoteId ? " active" : ""}`;
+          button.type = "button";
+          button.addEventListener("click", () => {
+            activeNoteId = note.id;
+            render();
+          });
+
+          const title = document.createElement("span");
+          title.className = "note-card-title";
+          title.textContent = note.title || "未命名笔记";
+
+          const preview = document.createElement("p");
+          preview.className = "note-card-preview";
+          preview.textContent = note.content || "空白笔记";
+
+          const time = document.createElement("span");
+          time.className = "note-card-time";
+          time.textContent = formatDate(note.updatedAt);
+
+          button.append(title, preview, time);
+          notesList.append(button);
+        });
+      }
+
+      function renderEditor() {
+        const activeNote = getActiveNote();
+        const hasActiveNote = Boolean(activeNote);
+
+        titleInput.disabled = !hasActiveNote;
+        contentInput.disabled = !hasActiveNote;
+        deleteNoteButton.disabled = !hasActiveNote;
+
+        if (!activeNote) {
+          titleInput.value = "";
+          contentInput.value = "";
+          saveStatus.textContent = "没有可编辑的笔记";
+          return;
+        }
+
+        titleInput.value = activeNote.title;
+        contentInput.value = activeNote.content;
+        saveStatus.textContent = `最后更新：${formatDate(activeNote.updatedAt)}`;
+      }
+
+      function formatDate(value) {
+        return new Intl.DateTimeFormat("zh-CN", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(new Date(value));
+      }
+
+      newNoteButton.addEventListener("click", createNote);
+      deleteNoteButton.addEventListener("click", deleteActiveNote);
+      searchInput.addEventListener("input", renderNotesList);
+      titleInput.addEventListener("input", updateActiveNote);
+      contentInput.addEventListener("input", updateActiveNote);
+
+      render();
+    </script>
   </body>
 </html>
