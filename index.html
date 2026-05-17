@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>我的记事本</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="app-title">
+        <div>
+          <p class="eyebrow">Local Notes</p>
+          <h1 id="app-title">我的记事本</h1>
+          <p class="hero-text">写下灵感、待办和学习笔记。内容会自动保存在这个浏览器里。</p>
+        </div>
+        <button id="new-note-button" class="primary-button" type="button">新建笔记</button>
+      </section>
+
+      <section class="workspace" aria-label="记事本工作区">
+        <aside class="notes-panel">
+          <label class="search-label" for="search-input">搜索笔记</label>
+          <input id="search-input" class="search-input" type="search" placeholder="输入标题或内容">
+          <div id="notes-list" class="notes-list" aria-live="polite"></div>
+        </aside>
+
+        <section class="editor-panel" aria-labelledby="editor-title">
+          <div class="editor-header">
+            <div>
+              <p class="eyebrow">Editor</p>
+              <h2 id="editor-title">编辑笔记</h2>
+            </div>
+            <button id="delete-note-button" class="ghost-button danger" type="button">删除</button>
+          </div>
+
+          <label class="field-label" for="note-title">标题</label>
+          <input id="note-title" class="title-input" type="text" maxlength="80" placeholder="例如：今天要完成的事">
+
+          <label class="field-label" for="note-content">内容</label>
+          <textarea id="note-content" class="content-input" placeholder="开始写点什么吧..."></textarea>
+
+          <p id="save-status" class="save-status" role="status">准备就绪</p>
+        </section>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
