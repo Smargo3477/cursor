@@ -7,18 +7,38 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
     <main class="app-shell">
       <section class="hero" aria-labelledby="app-title">
-        <div>
-          <p class="eyebrow">Local Notes</p>
+        <div class="hero-content">
+          <div class="brand-row">
+            <span class="app-mark" aria-hidden="true">N</span>
+            <p class="eyebrow">Local Notes</p>
+          </div>
           <h1 id="app-title">我的记事本</h1>
           <p class="hero-text">写下灵感、待办和学习笔记。内容会自动保存在这个浏览器里。</p>
+          <div class="hero-pills" aria-label="功能亮点">
+            <span>自动保存</span>
+            <span>快速搜索</span>
+            <span>本地隐私</span>
+          </div>
         </div>
-        <button id="new-note-button" class="primary-button" type="button">新建笔记</button>
+        <div class="hero-actions">
+          <p class="today-label">把想法收进来</p>
+          <button id="new-note-button" class="primary-button" type="button">新建笔记</button>
+        </div>
       </section>
 
       <section class="workspace" aria-label="记事本工作区">
         <aside class="notes-panel">
+          <div class="panel-title">
+            <div>
+              <p class="eyebrow">Library</p>
+              <h2>笔记列表</h2>
+            </div>
+          </div>
           <label class="search-label" for="search-input">搜索笔记</label>
           <input id="search-input" class="search-input" type="search" placeholder="输入标题或内容">
           <div id="notes-list" class="notes-list" aria-live="polite"></div>
@@ -29,6 +49,7 @@
             <div>
               <p class="eyebrow">Editor</p>
               <h2 id="editor-title">编辑笔记</h2>
+              <p class="editor-subtitle">灵感不用排队，随手记下来。</p>
             </div>
             <button id="delete-note-button" class="ghost-button danger" type="button">删除</button>
           </div>
